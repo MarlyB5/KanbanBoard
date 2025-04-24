@@ -1,0 +1,39 @@
+
+void parseLine(char *line, List **currentList, List **board) {
+    char *trimmed = trimLeadingWhitespace(line);
+    size_t len = strlen(trimmed);
+    if (len > 0 && trimmed[len - 1] == '\n') trimmed[len - 1] = '\0';
+
+    if (strchr(trimmed, ':')) {
+        *currentList = createList(trimmed);
+        appendList(board, *currentList);
+    } else if (*currentList) {
+        Item *item = createItem(trimmed);
+        Item *temp = (*currentList)->items;
+        if (!temp) {
+            (*currentList)->items = item;
+        } else {
+            while (temp->next) temp = temp->next;
+            temp->next = item;
+        }
+    }
+}
+
+void loadBoardWithModularParsing(List **board) {
+    char filename[100], line[MAX_LINE];
+    printf("Enter filename: ");
+    scanf("%s", filename);
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        printf("Error: could not open file %s\n", filename);
+        return;
+    }
+
+    List *currentList = NULL;
+    while (fgets(line, MAX_LINE, fp)) {
+        parseLine(line, &currentList, board);
+    }
+
+    fclose(fp);
+    printf("Board loaded using modular parser.\n");
+}
