@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include "functions.h"
 
-list* first_list = NULL;
-
-void edit_board(void){
+void edit_board(Board *board){
     int option = 0;
     printf("Options:\n");
     printf("1. Edit the name of a list\n");
@@ -16,11 +14,11 @@ void edit_board(void){
     scanf("%d", &option);
 
     switch(option){
-        case 1: edit_list_name();
+        case 1: edit_list_name(board);
         break;
-        case 2: add_list();
+        case 2: add_list(board);
         break;
-        case 3: delete_list();
+        case 3: delete_list(board);
         break;
         case 4: break;
         default: printf("Invalid option");
@@ -28,8 +26,8 @@ void edit_board(void){
     }
 }
 
-void edit_list_name(void){
-    list* cur_list = first_list;
+void edit_list_name(Board *board){
+    list* cur_list = board->list;
     list* list_to_edit = NULL;
     int found = 0;
     char new_name[MAX_CHARACTERS];
@@ -54,7 +52,7 @@ void edit_list_name(void){
     }
 }
 
-void add_list(void){
+void add_list(Board *board){
     char new_name[MAX_CHARACTERS];
 
     printf("Enter name of new list:");
@@ -63,25 +61,25 @@ void add_list(void){
     list* new_list = malloc(sizeof(list));
 
     if (new_list == NULL){
-        printf("Memroy error");
+        printf("Memory error");
         return;
     }
 
     strcpy(new_list->name, new_name);
     new_list->items = NULL;
-    new_list->next = first_list;
+    new_list->next = board->list;
     new_list->prev = NULL;
 
-    if(first_list != NULL){
-        first_list->prev = new_list;
+    if(board->list != NULL){
+        board->list->prev = new_list;
     }
     
-    first_list = new_list;
+    board->list = new_list;
 }
 
-void delete_list(void){
+void delete_list(Board *board){
     char list_name[MAX_CHARACTERS];
-    list* cur_list = first_list;
+    list* cur_list = board->list;
 
     printf("Enter the name of list you wish to edit:");
     scanf("%s", list_name);
@@ -90,7 +88,7 @@ void delete_list(void){
         cur_list = cur_list->next;        
     }
 
-    if (cur_list = NULL){
+    if (cur_list == NULL){
         printf("List not found");
         return;
     }
@@ -99,7 +97,7 @@ void delete_list(void){
         cur_list->prev->next = cur_list->next;
     }
     else{
-        first_list = cur_list->next;
+        board->list = cur_list->next;
     }
 
     if (cur_list-> next != NULL){
@@ -117,8 +115,8 @@ void delete_list(void){
     free(cur_list);
 }
 
-void edit_list(void){
-    list* cur_list = first_list;
+void edit_list(Board *board){
+    list* cur_list = board->list;
     char list_name[MAX_CHARACTERS];
     list* list_to_edit = NULL;
 
@@ -230,8 +228,8 @@ void delete_item(item** first_item){
     free(cur_item);
 }
 
-void display(void){
-    list* cur_list = first_list;
+void display(Board *board){
+    list* cur_list = board->list;
 
     while (cur_list != NULL){
         printf("%s:\n", cur_list->name);

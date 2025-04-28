@@ -14,15 +14,24 @@ typedef struct list{
     struct list* prev;
 }list;
 
+typedef struct Board {
+    list *list;
+ } Board;
+
+ 
 
 
 //Functions
-void edit_board(void);
-void edit_list_name(void);
-void add_list(void);
-void delete_list(void);
-void edit_list(void);
+void edit_board(Board *board);
+void edit_list_name(Board *board);
+void add_list(Board *board);
+void delete_list(Board *board);
+void edit_list(Board *board);
 void edit_item(item** first_item);
 void add_item(item** first_item);
 void delete_item(item** first_item);
-void display(void);
+void display(Board *board);
+void saveBoardFile(Board *board, char *fileName);
+void quitProgram ();
+void parseLine(char *line, list **currentList, list **board);
+void loadBoardWithModularParsing(Board *board);
