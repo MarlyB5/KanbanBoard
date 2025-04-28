@@ -1,3 +1,4 @@
+// Written by: Marly Bah
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,9 +6,11 @@
 
 int main() {
     //initialise user choice to 0 to avoid undefined behaviour
-    Board board = {.list = NULL};
-
     int user_choice = 0;
+
+    //create a board and initialize to NULL
+    Board board = {.list = NULL}; 
+
     while(1){
        printf ("_________________\n");
        printf ("   ⋆｡°✩MENU⋆｡°✩\n");
