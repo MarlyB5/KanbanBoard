@@ -90,13 +90,14 @@ void add_list(Board *board){
     }
     
     board->list = new_list;
-    printf("List added successfully./n");
+    printf("List added successfully.\n");
 }
 
 // Function to delete a specified list
 void delete_list(Board *board){
     char list_name[MAX_CHARACTERS];
     list* cur_list = board->list;
+    list* prev_list = NULL;
 
     // Ask which list to delete
     printf("Enter the name of list you wish to delete: ");
@@ -104,7 +105,8 @@ void delete_list(Board *board){
     
     // Find the list
     while(cur_list != NULL && strcmp(cur_list->name, list_name) != 0){
-        cur_list = cur_list->next;        
+        prev_list = cur_list;
+        cur_list = cur_list->next;       
     }
 
     if (cur_list == NULL){
@@ -112,25 +114,27 @@ void delete_list(Board *board){
         return;
     }
 
+    // Free items in the list
+    item* cur_item = cur_list->items;
+    while (cur_item != NULL){
+        item* temp = cur_item;
+        cur_item = cur_item->next;
+        free(temp);
+    }
+
     // Adjust pointers so they leave out the soon to be deleted list
-    if (cur_list->prev != NULL){
-        cur_list->prev->next = cur_list->next;
+
+    if (prev_list == NULL){
+        board->list = cur_list->next;
+        if (board->list != NULL){
+            board->list->prev = NULL;
+        }
     }
     else{
-        board->list = cur_list->next;
-    }
-
-    if (cur_list-> next != NULL){
-        cur_list->next->prev = cur_list->prev;
-    }
-
-    // Free items in the list
-    item* cur_item = NULL;
-
-    while (cur_list->items != NULL){
-        cur_item = cur_list->items;
-        cur_list->items = cur_list->items->next;
-        free(cur_item);
+        prev_list->next = cur_list->next;
+        if (cur_list->next != NULL){
+            cur_list->next->prev = prev_list;
+        }
     }
 
     free(cur_list);
@@ -206,12 +210,13 @@ void edit_item(item** first_item){
     while(cur_item != NULL){
         if (strcmp(cur_item->name, item_to_edit) == 0){
             strcpy(cur_item->name, new_item);// change item
+            printf("Item renamed successfully.\n");
             return;
         }
         cur_item = cur_item->next;
     }
     
-    printf("Item renamed successfully.\n");
+    printf("Item not found.\n");
 }
 
 // Function that adds new item to start of the list
@@ -239,46 +244,52 @@ void add_item(item** first_item){
 
 // Function that deletes item from a list
 void delete_item(item** first_item){
-    char item_name[MAX_CHARACTERS];
-
     // check if list contains any items
     if (*first_item == NULL){
         printf("The list is empty.\n");
         return;
     }
 
+    char item_name[MAX_CHARACTERS];
+
+    while ((getchar()) != '\n');
+
     // ask which item needs to be deleted
     printf("Enter name of item to delete: ");
-    scanf("%s", item_name);
-
+    scanf("%99[^\n]", item_name);
+    item_name[strcspn(item_name, "\n")] = '\0';
 
     item* cur_item = *first_item;
     item* prev_item = NULL;
 
-    // find item
-    while (cur_item != NULL){
-        if (strcmp(cur_item->name, item_name) == 0){
+    while (cur_item != NULL) {
+        // Create comparison string with tab
+        char tabbed_name[MAX_CHARACTERS + 1];
+        snprintf(tabbed_name, sizeof(tabbed_name), "\t%s", item_name);
+
+        if (strcmp(cur_item->name, item_name) == 0 || 
+            strcmp(cur_item->name, tabbed_name) == 0) {
             break;
         }
+
         prev_item = cur_item;
         cur_item = cur_item->next;
     }
 
-    if (cur_item == NULL){
-        printf("Item not found\n");
+    if (cur_item == NULL) {
+        printf("Item '%s' not found!\n", item_name);
         return;
     }
 
-    // adjust pointers to not include specified item
-    if (prev_item != NULL){
+    // Re-link list to remove the item
+    if (prev_item == NULL) {
+        *first_item = cur_item->next;
+    } else {
         prev_item->next = cur_item->next;
     }
-    else{
-        *first_item = cur_item->next;
-    }
-
     free(cur_item);
     printf("Item deleted successfully.\n");
+    
 }
 
 // Function to display the entire board
