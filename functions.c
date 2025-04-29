@@ -4,13 +4,17 @@
 #include <stdlib.h>
 #include "functions.h"
 
-// Sets up a menu that allows users to edit lists
+///////////////////////////
+// FUNCTIONS TO EDIT BOARD
+///////////////////////////
+
+// Function to display board editing menu allowing user to edit list name, add a list, and delete a list
 void edit_board(Board *board){
     int option = 0;
     printf("Options:\n");
     printf("1. Edit the name of a list\n");
     printf("2. Add a new list\n");
-    printf("3. Delete a list");
+    printf("3. Delete a list\n");
     printf("4. Return to main menu\n");
     printf("Enter your option: ");
     scanf("%d", &option);
@@ -23,12 +27,12 @@ void edit_board(Board *board){
         case 3: delete_list(board);
         break;
         case 4: break;
-        default: printf("Invalid option");
+        default: printf("Invalid option\n");
         break;
     }
 }
 
-//Changes the name of a list
+// Function to rename a list
 void edit_list_name(Board *board){
     list* cur_list = board->list;
     list* list_to_edit = NULL;
@@ -53,22 +57,24 @@ void edit_list_name(Board *board){
     }
 
     if(!found){
-        printf("List not found");
+        printf("List not found\n");
     }
+
+    printf("List renamed successfully.\n");
 }
 
-//Adds a new list to the start of the board
+// Function to add a new list to the start of the board
 void add_list(Board *board){
     char new_name[MAX_CHARACTERS];
 
-    //Ask for ne list name
-    printf("Enter name of new list:");
+    //Ask for new list name
+    printf("Enter name of new list: ");
     scanf("%s", new_name);
 
     list* new_list = malloc(sizeof(list));
 
     if (new_list == NULL){
-        printf("Memory error");
+        printf("Memory error\n");
         return;
     }
 
@@ -84,28 +90,29 @@ void add_list(Board *board){
     }
     
     board->list = new_list;
+    printf("List added successfully./n");
 }
 
-//Delets a specified list
+// Function to delete a specified list
 void delete_list(Board *board){
     char list_name[MAX_CHARACTERS];
     list* cur_list = board->list;
 
-    //Ask which list to delete
-    printf("Enter the name of list you wish to edit:");
+    // Ask which list to delete
+    printf("Enter the name of list you wish to delete: ");
     scanf("%s", list_name);
     
-    //Find the list
+    // Find the list
     while(cur_list != NULL && strcmp(cur_list->name, list_name) != 0){
         cur_list = cur_list->next;        
     }
 
     if (cur_list == NULL){
-        printf("List not found");
+        printf("List not found\n");
         return;
     }
 
-    //Adjust pointers so they leave out the soon to be deleted list
+    // Adjust pointers so they leave out the soon to be deleted list
     if (cur_list->prev != NULL){
         cur_list->prev->next = cur_list->next;
     }
@@ -117,7 +124,7 @@ void delete_list(Board *board){
         cur_list->next->prev = cur_list->prev;
     }
 
-    //Free items in the list
+    // Free items in the list
     item* cur_item = NULL;
 
     while (cur_list->items != NULL){
@@ -127,19 +134,24 @@ void delete_list(Board *board){
     }
 
     free(cur_list);
+    printf("List deleted successfully.\n");
 }
 
-//Sets up a menu for the user to edit items in a list
+///////////////////////////
+// FUNCTIONS TO EDIT LISTS
+///////////////////////////
+
+// Function that displays menu that allows user to edit item names, add items, and delete items
 void edit_list(Board *board){
     list* cur_list = board->list;
     char list_name[MAX_CHARACTERS];
     list* list_to_edit = NULL;
 
-    //Ask for the name of the list of which items need to be edited
+    // Ask for the name of the list of which items need to be edited
     printf("Enter the name of the list to edit: ");
     scanf("%s", list_name);
 
-    //Find list
+    // Find list
     while (cur_list != NULL){
         if (strcmp(list_name, cur_list->name) == 0){
             list_to_edit = cur_list;
@@ -150,7 +162,7 @@ void edit_list(Board *board){
     }
 
     if (list_to_edit == NULL){
-        printf("List not found");
+        printf("List not found\n");
         return;
     }
 
@@ -158,7 +170,7 @@ void edit_list(Board *board){
     printf("Options:\n");
     printf("1. Edit an item\n");
     printf("2. Add an item\n");
-    printf("3. Delete an item");
+    printf("3. Delete an item\n");
     printf("4. Return to main menu\n");
     printf("Enter your option: ");
     scanf("%d", &option);
@@ -171,80 +183,93 @@ void edit_list(Board *board){
         case 3: delete_item(&list_to_edit->items);
         break;
         case 4: break;
-        default: printf("Invalid option");
+        default: printf("Invalid option\n");
         break;
     }
 }
 
-//Edits an item's name in a list
+//Function that edits an item's name in a list
 void edit_item(item** first_item){
     char item_to_edit[MAX_CHARACTERS];
     char new_item[MAX_CHARACTERS];
 
-    //Ask for item that needs tobe changed
-    printf("Enter the name of item to edit");
+    //Ask for item that needs t obe changed
+    printf("Enter the name of item to edit: ");
     scanf("%s", item_to_edit);
 
-    printf("Enter new name:");
+    printf("Enter new name: ");
     scanf("%s", new_item);
 
     item* cur_item = *first_item;
 
-    //find item
+    // find item
     while(cur_item != NULL){
         if (strcmp(cur_item->name, item_to_edit) == 0){
-            strcpy(cur_item->name, new_item);//change item
+            strcpy(cur_item->name, new_item);// change item
             return;
         }
         cur_item = cur_item->next;
     }
+    
+    printf("Item renamed successfully.\n");
 }
 
-//Adds new item to start of the list
+// Function that adds new item to start of the list
 void add_item(item** first_item){
     char item_name[MAX_CHARACTERS];
 
-    //Ask for new item name
-    printf("Enter item name:");
+    // Ask for new item name
+    printf("Enter item name: ");
     scanf("%s", item_name);
 
     item* new_item = malloc(sizeof(item));
     
     if (new_item == NULL){
-        printf("Memory error");
+        printf("Memory error\n");
         return;
     }
 
-    //intialize item
+    // intialize item
     strcpy(new_item->name, item_name);
 
     new_item->next = *first_item;
     *first_item = new_item;
+    printf("Item added successfully.\n");
 }
 
-//Delets item from a list
+// Function that deletes item from a list
 void delete_item(item** first_item){
     char item_name[MAX_CHARACTERS];
 
-    //ask which item needs to be deleted
-    printf("Enter name of item to delete:");
+    // check if list contains any items
+    if (*first_item == NULL){
+        printf("The list is empty.\n");
+        return;
+    }
+
+    // ask which item needs to be deleted
+    printf("Enter name of item to delete: ");
     scanf("%s", item_name);
+
 
     item* cur_item = *first_item;
     item* prev_item = NULL;
 
-    //find item
-    while (cur_item != NULL && strcmp(cur_item->name, item_name)){
+    // find item
+    while (cur_item != NULL){
+        if (strcmp(cur_item->name, item_name) == 0){
+            break;
+        }
         prev_item = cur_item;
         cur_item = cur_item->next;
     }
 
     if (cur_item == NULL){
-        printf("Item not found");
+        printf("Item not found\n");
         return;
     }
 
-    //adjust pointers to not include specified item
+    // adjust pointers to not include specified item
     if (prev_item != NULL){
         prev_item->next = cur_item->next;
     }
@@ -253,12 +278,15 @@ void delete_item(item** first_item){
     }
 
     free(cur_item);
+    printf("Item deleted successfully.\n");
 }
 
-//display the entire board
+// Function to display the entire board
 void display(Board *board){
     list* cur_list = board->list;
 
+    printf("\n\n");
+    printf("  KANBAN BOARD  \n\n");
     while (cur_list != NULL){
         printf("%s:\n", cur_list->name);
         item* cur_item = cur_list->items;
@@ -268,4 +296,5 @@ void display(Board *board){
         }
         cur_list = cur_list->next;
     }
+    printf("\n\n");
 }
